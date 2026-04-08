@@ -57,6 +57,14 @@ export default function DashboardPage() {
     const [alert, setAlert] = useState<string | null>(null);
 
     const [studentId, setStudentId] = useState<string | null>(null);
+    const [userName, setUserName] = useState<string>("");
+
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return "Good Morning";
+        if (hour < 18) return "Good Afternoon";
+        return "Good Evening";
+    };
 
     import("@/lib/supabase").then(({ supabase }) => {
         // Just setting up simple tracking interval outside of react cycle to prevent massive re-renders
@@ -68,8 +76,15 @@ export default function DashboardPage() {
             const { supabase } = await import('@/lib/supabase');
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
-                const { data } = await supabase.from('students').select('id').eq('auth_id', session.user.id).single();
-                if (data) setStudentId(data.id);
+                const { data } = await supabase.from('students').select('id, name').eq('auth_id', session.user.id).single();
+                if (data) {
+                    setStudentId(data.id);
+                    setUserName(data.name || session.user.user_metadata?.full_name || "Student");
+                } else if (session.user.user_metadata?.full_name) {
+                    setUserName(session.user.user_metadata.full_name);
+                } else {
+                    setUserName("Teacher/Admin");
+                }
             }
         };
         init();
@@ -137,6 +152,9 @@ export default function DashboardPage() {
             <div className="max-w-7xl mx-auto">
                 <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
                     <div>
+                        <h2 className="text-xl md:text-2xl text-accent font-medium mb-2">
+                            {getGreeting()}{userName ? `, ${userName}` : ''}!
+                        </h2>
                         <h1 className="text-4xl md:text-6xl font-black font-outfit mb-4">Real-time Analytics</h1>
                         <p className="text-gray-400 flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
