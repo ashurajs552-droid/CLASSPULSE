@@ -23,16 +23,21 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
 
             // If we are logged in, check if onboarding is complete
             if (pathname !== "/onboarding") {
-                const { data, error } = await supabase
-                    .from("students")
-                    .select("id")
-                    .eq("auth_id", session.user.id)
-                    .single();
+                const isTeacher = session.user.user_metadata?.role === 'teacher' || 
+                                  (typeof window !== "undefined" && localStorage.getItem('user_role') === 'teacher');
+                
+                if (!isTeacher) {
+                    const { data, error } = await supabase
+                        .from("students")
+                        .select("id")
+                        .eq("auth_id", session.user.id)
+                        .single();
 
-                if (!data || error) {
-                    // Not onboarded -> redirect to onboarding
-                    router.push("/onboarding");
-                    return;
+                    if (!data || error) {
+                        // Not onboarded -> redirect to onboarding
+                        router.push("/onboarding");
+                        return;
+                    }
                 }
             }
 

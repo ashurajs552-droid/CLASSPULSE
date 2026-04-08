@@ -3,14 +3,12 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, LayoutDashboard, Cpu, Video, FileText, Settings, LogOut, User as UserIcon, Sun, Moon } from "lucide-react";
+import { Activity, LayoutDashboard, Cpu, Video, FileText, Settings, LogOut, User as UserIcon, Sun, Moon, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 
-const publicNavItems = [
-    { name: "Home", path: "/", icon: Activity },
-];
+const publicNavItems: { name: string; path: string; icon: any }[] = [];
 
 const protectedNavItems = [
     { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
@@ -19,6 +17,10 @@ const protectedNavItems = [
 
 const adminNavItems = [
     { name: "Admin", path: "/admin", icon: Settings },
+];
+
+const teacherNavItems = [
+    { name: "Teacher Portal", path: "/teacher/dashboard", icon: LayoutDashboard },
 ];
 
 export default function Navbar() {
@@ -58,6 +60,12 @@ export default function Navbar() {
         }
     };
 
+    const clearCache = () => {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = '/';
+    };
+
     const handleLogin = async () => {
         // Fallback if accessed via Navbar
         localStorage.setItem('user_role', 'student');
@@ -73,7 +81,11 @@ export default function Navbar() {
         await supabase.auth.signOut();
     };
 
-    const role_navs = role === "admin" ? [...protectedNavItems, ...adminNavItems] : protectedNavItems;
+    const role_navs = role === "admin" 
+        ? [...protectedNavItems, ...adminNavItems] 
+        : role === "teacher" 
+            ? teacherNavItems 
+            : protectedNavItems;
     const displayedNavItems = user ? [...publicNavItems, ...role_navs] : publicNavItems;
 
     return (
@@ -118,6 +130,13 @@ export default function Navbar() {
                 {!loading && (
                     <div className="flex items-center space-x-4">
                         <button 
+                            onClick={clearCache}
+                            className="p-2 glass-card rounded-full text-gray-400 hover:text-white transition-colors"
+                            title="Clear Cache"
+                        >
+                            <RefreshCw className="w-5 h-5" />
+                        </button>
+                        <button 
                             onClick={toggleTheme} 
                             className="p-2 glass-card rounded-full text-gray-400 hover:text-white transition-colors"
                         >
@@ -145,12 +164,20 @@ export default function Navbar() {
                                 </button>
                             </div>
                         ) : (
-                            <button 
-                                onClick={handleLogin}
-                                className="bg-accent/10 hover:bg-accent/20 text-accent border border-accent/20 px-4 py-2 rounded-lg font-medium transition-all"
-                            >
-                                Get Started
-                            </button>
+                            <div className="flex items-center gap-3">
+                                <Link 
+                                    href="/login"
+                                    className="text-gray-300 hover:text-white px-3 py-2 rounded-lg font-medium transition-all"
+                                >
+                                    Login
+                                </Link>
+                                <Link 
+                                    href="/signup"
+                                    className="bg-accent/10 hover:bg-accent/20 text-accent border border-accent/20 px-4 py-2 rounded-lg font-medium transition-all"
+                                >
+                                    Sign Up
+                                </Link>
+                            </div>
                         )}
                     </div>
                 )}

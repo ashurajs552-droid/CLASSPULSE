@@ -78,15 +78,16 @@ export default function Home() {
                 </Link>
             ) : (
                 <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
-                    <GlowingButton variant="primary" onClick={() => handleLogin('student')} className="w-full sm:w-auto text-lg flex items-center gap-2">
-                        <LogIn className="w-5 h-5" /> Student Login
-                    </GlowingButton>
-                    <GlowingButton variant="outline" onClick={() => handleLogin('teacher')} className="w-full sm:w-auto text-lg flex items-center gap-2 bg-white/5 border-primary/20">
-                        <LogIn className="w-5 h-5" /> Teacher Login
-                    </GlowingButton>
-                    <GlowingButton variant="outline" onClick={() => handleLogin('admin')} className="w-full sm:w-auto text-lg flex items-center gap-2 bg-white/5 border-accent/20">
-                        <LogIn className="w-5 h-5" /> Admin Login
-                    </GlowingButton>
+                    <Link href="/login" className="w-full sm:w-auto">
+                        <GlowingButton variant="outline" className="w-full text-lg flex items-center justify-center gap-2 bg-white/5 border-primary/20">
+                            <LogIn className="w-5 h-5" /> Login
+                        </GlowingButton>
+                    </Link>
+                    <Link href="/signup" className="w-full sm:w-auto">
+                        <GlowingButton variant="primary" className="w-full text-lg flex items-center justify-center gap-2">
+                            <LogIn className="w-5 h-5" /> Sign Up
+                        </GlowingButton>
+                    </Link>
                 </div>
             )}
             {!user && <Link href="/features" className="hidden">
@@ -187,9 +188,13 @@ export default function Home() {
                     <GlowingButton variant="secondary">Go to Dashboard</GlowingButton>
                 </Link>
             ) : (
-                <div className="flex gap-4">
-                    <GlowingButton variant="secondary" onClick={() => handleLogin('student')}>Student Login</GlowingButton>
-                    <GlowingButton variant="outline" onClick={() => handleLogin('admin')}>Teacher/Admin Login</GlowingButton>
+                <div className="flex gap-4 justify-center">
+                    <Link href="/login">
+                        <GlowingButton variant="outline">Login</GlowingButton>
+                    </Link>
+                    <Link href="/signup">
+                        <GlowingButton variant="secondary">Sign Up</GlowingButton>
+                    </Link>
                 </div>
             )}
           </div>
