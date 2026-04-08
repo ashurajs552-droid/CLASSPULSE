@@ -26,7 +26,7 @@ export default function Home() {
 
     const handleLogin = async (role: string = 'student') => {
         localStorage.setItem('user_role', role);
-        await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${window.location.origin}/auth/callback` } });
+        await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${window.location.origin}` } });
     };
 
   return (
