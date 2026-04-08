@@ -33,6 +33,13 @@ export default function Navbar() {
     useEffect(() => {
         // Check current session
         supabase.auth.getSession().then(({ data: { session } }) => {
+            if (typeof window !== "undefined" && localStorage.getItem('admin_bypass') === 'true') {
+                 setUser({ email: 'ashurajs558@gmail.com', user_metadata: { full_name: 'Admin ROOT', role: 'admin' } } as any);
+                 setRole('admin');
+                 setLoading(false);
+                 return;
+            }
+
             setUser(session?.user || null);
             setLoading(false);
             if (typeof window !== "undefined") {
@@ -78,6 +85,13 @@ export default function Navbar() {
     };
 
     const handleLogout = async () => {
+        if (typeof window !== 'undefined' && localStorage.getItem('admin_bypass') === 'true') {
+             localStorage.removeItem('admin_bypass');
+             localStorage.removeItem('user_role');
+             setUser(null);
+             window.location.href = '/';
+             return;
+        }
         await supabase.auth.signOut();
     };
 

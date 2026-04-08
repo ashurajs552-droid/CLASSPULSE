@@ -14,15 +14,16 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     useEffect(() => {
         const checkAuth = async () => {
             const { data: { session } } = await supabase.auth.getSession();
+            const isAdminBypass = typeof window !== 'undefined' && localStorage.getItem('admin_bypass') === 'true';
             
-            if (!session) {
+            if (!session && !isAdminBypass) {
                 // Not logged in -> home
                 router.push("/");
                 return;
             }
 
-            // If we are logged in, check if onboarding is complete
-            if (pathname !== "/onboarding") {
+            // If we are logged in or bypassed, check if onboarding is complete
+            if (pathname !== "/onboarding" && !isAdminBypass && session) {
                 const isTeacher = session.user.user_metadata?.role === 'teacher' || 
                                   (typeof window !== "undefined" && localStorage.getItem('user_role') === 'teacher');
                 
