@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import GlassCard from "@/components/GlassCard";
 import { useRouter } from "next/navigation";
@@ -12,6 +12,15 @@ export default function LoginPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Ensure session cache is cleared on mount so the user starts fresh
+    useEffect(() => {
+        const clearSession = async () => {
+            await supabase.auth.signOut();
+            localStorage.removeItem('user_role');
+        };
+        clearSession();
+    }, []);
     
     const [formData, setFormData] = useState({
         email: "",
@@ -127,9 +136,16 @@ export default function LoginPage() {
                         <button 
                             type="button"
                             onClick={async () => {
+                                // determine absolute url for Vercel friendliness
+                                const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : process.env.NEXT_PUBLIC_SITE_URL + '/dashboard';
                                 await supabase.auth.signInWithOAuth({ 
                                     provider: 'google', 
-                                    options: { redirectTo: `${window.location.origin}/dashboard` } 
+                                    options: { 
+                                        redirectTo: redirectUrl,
+                                        queryParams: {
+                                            prompt: 'select_account' // Forces the account selection screen
+                                        }
+                                    } 
                                 });
                             }}
                             className="w-full py-3 px-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white border border-white/10"

@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import GlassCard from "@/components/GlassCard";
 import GlowingButton from "@/components/GlowingButton";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, BookOpen, Layers, Edit3, Save, FileText, Send, ChevronDown, Award, AlertCircle } from "lucide-react";
+import { Users, BookOpen, Layers, Edit3, Save, FileText, Send, ChevronDown, Award, AlertCircle, User as UserIcon, Activity } from "lucide-react";
 
 export default function TeacherDashboard() {
     const [selectedDept, setSelectedDept] = useState("");

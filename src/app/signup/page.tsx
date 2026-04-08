@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import GlowingButton from "@/components/GlowingButton";
 import GlassCard from "@/components/GlassCard";
@@ -15,6 +15,15 @@ export default function SignupPage() {
     const [role, setRole] = useState<"student" | "teacher" | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Ensure session cache is cleared on mount so the user starts fresh
+    useEffect(() => {
+        const clearSession = async () => {
+            await supabase.auth.signOut();
+            localStorage.removeItem('user_role');
+        };
+        clearSession();
+    }, []);
     
     const [formData, setFormData] = useState({
         firstName: "",
@@ -196,9 +205,15 @@ export default function SignupPage() {
                                         return;
                                     }
                                     localStorage.setItem('user_role', role);
+                                    const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/onboarding` : process.env.NEXT_PUBLIC_SITE_URL + '/onboarding';
                                     await supabase.auth.signInWithOAuth({ 
                                         provider: 'google', 
-                                        options: { redirectTo: `${window.location.origin}/onboarding` } 
+                                        options: { 
+                                            redirectTo: redirectUrl,
+                                            queryParams: {
+                                                prompt: 'select_account' // Forces the account selection screen
+                                            }
+                                        } 
                                     });
                                 }}
                                 className="w-full py-3 px-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white border border-white/10"
